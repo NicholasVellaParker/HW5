@@ -1,0 +1,30 @@
+# Solve the system
+solution = solve_ivp(system, t_span, y0, t_eval=t_eval,
+                     args=(A, m, y, k, ps, pa, rho, V, b))
+
+# Extract results
+t = solution.t
+xdot = solution.y[1]
+p1 = solution.y[2]
+p2 = solution.y[3]
+
+# Plot xdot(t)
+plt.figure(figsize=(8,4))
+plt.plot(t, xdot, label='xdot(t)')
+plt.xlabel('Time [s]')
+plt.ylabel('Velocity [m/s]')
+plt.title('Velocity of the mass vs time')
+plt.grid(True)
+plt.legend()
+plt.show()
+
+# Plot p1(t) and p2(t) on same graph
+plt.figure(figsize=(8,4))
+plt.plot(t, p1, label='p1(t)')
+plt.plot(t, p2, label='p2(t)')
+plt.xlabel('Time [s]')
+plt.ylabel('Pressure [Pa]')
+plt.title('Pressures p1 and p2 vs time')
+plt.grid(True)
+plt.legend()
+plt.show()
