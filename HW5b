@@ -46,6 +46,9 @@ if __name__ == "__main__":
     rr=(e*10**-6)/d
 
     f_point = friction_factor(Re, rr)
+    g = 32.174  # gravity in ft/s²
+    hf_per_L = f_point * V ** 2 / (2 * g * (d / 12))  # d converted to feet
+    print(f"Head Loss per Unit Length (hf/L) = {hf_per_L:.4f} ft/ft")
     print(f"Friction Factor = {f_point:.4f}")
     print(f"Reynolds Number = {Re:.0e}")
     if Re< 2000:
