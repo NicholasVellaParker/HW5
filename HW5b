@@ -1,0 +1,58 @@
+import numpy as np
+from scipy.optimize import fsolve
+import matplotlib.pyplot as plt
+import math
+
+def friction_factor(Re,rr):
+    if Re < 2000:
+        return 64/Re
+    else:
+        colebrook = lambda f: 1/np.sqrt(f)+2*np.log10(rr/3.7+2.51/(Re*np.sqrt(f)))
+        f = fsolve(colebrook, 0.0008)
+        return f[0]
+
+def plotMoody(plotPoint=False, pt=(0,0), marker='o'):
+    ReValsL = np.logspace(np.log10(600), np.log10(2000), 20)
+    ReValsTrans = np.logspace(np.log10(2000), np.log10(4000), 20)
+    ReValsCB = np.logspace(np.log10(4000), np.log10(1e8), 200)
+    rrVals = np.array([ 1e-6, 5e-6, 1e-5, 5e-5, 1e-4, 2e-4, 4e-4, 6e-4, 8e-4,
+                       1e-3, 2e-3, 4e-3, 6e-3, 8e-3, 1.5e-2, 2e-2, 3e-2, 4e-2, 5e-2])
+    ffLam = np.array([friction_factor(Re, 0) for Re in ReValsL])
+    ffTrans = np.array([friction_factor(Re, 0) for Re in ReValsTrans])
+    ffCB = np.array([[friction_factor(Re, rr) for Re in ReValsCB] for rr in rrVals])
+    plt.loglog(ReValsL,ffLam,'o-',label='Laminar')
+    plt.loglog(ReValsTrans,ffTrans,'o-',label='Transition')
+    for i, rr in enumerate(rrVals):
+        plt.loglog(ReValsCB, ffCB[i], 'k')
+        plt.text(ReValsCB[-1], ffCB[i][-1], f'{rr:0e}')
+    if plotPoint:
+        plt.plot(pt[0], pt[1], marker=marker, markersize=10, markeredgecolor='red', markerfacecolor='none', linestyle='None')
+    plt.xlabel('Reynolds Number')
+    plt.ylabel('Friction Factor')
+    plt.xlim(600,1e8)
+    plt.ylim(0.008,0.1)
+    plt.grid(True, which = 'both', linestyle='--', alpha=0.5)
+    plt.show()
+
+if __name__ == "__main__":
+    d = float(input("Input Pipe Diameter in Inches"))
+    e = float(input("Input Pipe Roughness in micro inches"))
+    Q = float(input("Inpt Flow Rate in Gallons/min"))
+
+    A=(math.pi/4)*(d/12)**2
+    V=(0.133*Q)/(A*60)
+    nu = 1.08*10**-5
+    Re = V*d/nu
+    rr=(e*10**-6)/d
+
+    f_point = friction_factor(Re, rr)
+    print(f"Friction Factor = {f_point:.4f}")
+    print(f"Reynolds Number = {Re:.0e}")
+    if Re< 2000:
+        marker = 'o'
+    elif 2000 < Re<4000:
+        marker = '^'
+    else:
+        marker = 'o'
+
+    plotMoody(plotPoint=True, pt=(Re, f_point), marker=marker)
