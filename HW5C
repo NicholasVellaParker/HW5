@@ -1,3 +1,29 @@
+A = 4.909*10**-4 #m^2
+Cd = 0.6
+ps = 1.4*10**7 #Pa
+pa = 1*10**5 #Pa
+V=1.473*10**-4 #m^3
+b = 2*10**9 #Pa
+rho = 850 #kg/m^3
+k = 2*10**-5
+m= 30 #kg
+y=0.002
+import numpy as np
+from scipy.integrate import solve_ivp
+import matplotlib.pyplot as plt
+
+def system( Y, A, m, y, k, ps, pa, rho, V, b):
+    x, v, p1, p2 = Y   # x, dx/dt, p1, p2
+    dxdt = v
+    dvdt = (p1 - p2) * A / m
+    dp1dt = (b / (V * rho)) * (y * k * (ps - p1) - rho * A * v)
+    dp2dt = (b / (V * rho)) * (y * k * (p2 - pa) - rho * A * v)
+    return [dxdt, dvdt, dp1dt, dp2dt]
+# Initial conditions: x0, v0, p1_0, p2_0
+y0 = [0, 0, pa, pa]
+
+t_span = (0, 0.01)  # seconds; adjust if needed
+t_eval = np.linspace(t_span[0], t_span[1], 500)
 # Solve the system
 solution = solve_ivp(system, t_span, y0, t_eval=t_eval,
                      args=(A, m, y, k, ps, pa, rho, V, b))
